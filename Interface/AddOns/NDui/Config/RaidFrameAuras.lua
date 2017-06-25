@@ -3,7 +3,6 @@ local module = NDui:RegisterModule("RaidFrameAuras")
 
 local TIER, BOSS = 1, 1
 local RaidBuffs, RaidDebuffs = {}, {}
-local testIndex = false
 
 -- 团队框体职业相关Buffs
 local RaidBuffs = {
@@ -60,6 +59,8 @@ local RaidBuffs = {
         [156910] = true,	-- 信仰道标
         [1044] = true,		-- 自由祝福
         [6940] = true,		-- 牺牲祝福
+        [25771] = true,		-- 自律
+        [223306] = true,	-- 赋予信仰
 	},
 	["PRIEST"] = {		-- 牧师
         [17] = true,		-- 真言术盾
@@ -67,12 +68,16 @@ local RaidBuffs = {
         [41635] = true,		-- 愈合祷言
         [194384] = true,	-- 救赎
         [47788] = true,		-- 守护之魂
+        [152118] = true,	-- 意志洞悉
+        [208065] = true,	-- 图雷之光
 	},
 	["MONK"] = {		-- 武僧
         [119611] = true,	-- 复苏之雾
         [116849] = true,	-- 作茧缚命
         [124682] = true,	-- 氤氲之雾
         [124081] = true,	-- 禅意波
+        [191840] = true,	-- 精华之泉
+        [115175] = true,	-- 抚慰之雾
 	},
 	["DEMONHUNTER"] = {	-- DH
 	},
@@ -86,36 +91,34 @@ local RaidBuffs = {
 
 function module:RegisterDebuff(tierID, instID, bossID, spellID, level)
 	local instName = EJ_GetInstanceInfo(instID)
+	--local bossName = EJ_GetEncounterInfo(bossID)
 	if not instName then print("Invalid instance ID: "..instID) return end
 
 	if not RaidDebuffs[instName] then RaidDebuffs[instName] = {} end
-	if level then
-		if level < 0 then level = 0 end
-		if level > 5 then level = 5 end
+	if level and level > 6 then
+		level = 6
 	else
 		level = 2
 	end
-	RaidDebuffs[instName][spellID] = level
 
-	if testIndex == instID then
-		SlashCmdList["NDUI_DUMPSPELL"](spellID)
-	end
+	RaidDebuffs[instName][spellID] = level
 end
 
 function module:OnLogin()
-	--[[
-		团队框体Debuffs添加格式：
-		self:RegisterDebuff(TIER, 副本ID, BOSS, 法术ID，Debuff优先级)
+	-- Convert table
+	if not NDuiADB["RaidDebuffs"] then NDuiADB["RaidDebuffs"] = {} end
+	local newTable = {}
+	for _, value in pairs(NDuiADB["RaidDebuffs"]) do
+		if value then
+			local instName, spellID, priority = unpack(value)
 
-		以下方为例，代表的是在<暗夜要塞>里添加<法术ID>219223，<优先级>为5，大于待驱散的魔法效果；
-		待驱散的魔法效果的优先级为4，你添加的要以此为基准；
-		当你没有填写副本ID时，默认优先级为2；当多个存在时，只能显示优先级最高的Debuff。
-		TIER和BOSS不用管它，副本ID的话，常用的有翡翠梦魇768，暗夜要塞786。
-	]]
-	-- 自定义团队框体Debuffs
-	self:RegisterDebuff(TIER, 786, BOSS, 219223, 5)
+			if not newTable[instName] then newTable[instName] = {} end
+			newTable[instName][spellID] = priority
+		end
+	end
+	B.CopyTable(newTable, RaidDebuffs)
 
-	-- Copy Table
+	-- Copy table
 	C.RaidAuraWatch = RaidBuffs
 	C.RaidDebuffs = RaidDebuffs
 end

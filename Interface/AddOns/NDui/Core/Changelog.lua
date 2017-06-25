@@ -2,15 +2,9 @@ local B, C, L, DB = unpack(select(2, ...))
 if DB.Client ~= "zhCN" then return end
 
 local hx = {
-	"施法条图标的边框调整；",
-	"技能监视列表更新；",
-	"团队框体法术列表更新；",
-	"任务进度条的皮肤调整；",
-	"Skada更新",
-	"角色面板的耐久度改为装备等级；",
-	"控制台调整；",
-	"给任务追踪栏皮肤加了个开关；",
-	"信息条公会模块优化。",
+	"团队框体的DEBUFF位置不再错误的显示BUFF；",
+	"头像的资源条调整；",
+	"玩家姓名板的资源条现在是独立的。",
 }
 
 local function changelog()
@@ -50,7 +44,7 @@ end
 NDui:EventFrame("PLAYER_ENTERING_WORLD"):SetScript("OnEvent", function(self)
 	self:UnregisterAllEvents()
 
-	NDuiADB["Changelog"] = NDuiADB["Changelog"] or {}
+	if not NDuiADB["Changelog"] then NDuiADB["Changelog"] = {} end
 	if (not HelloWorld) and NDuiADB["Changelog"].Version ~= DB.Version then
 		changelog()
 		NDuiADB["Changelog"].Version = DB.Version

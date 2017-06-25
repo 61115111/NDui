@@ -84,6 +84,19 @@ local function ConvertTable()
 	InsertData(IntCD.List, myTable[10])
 end
 
+local function CheckAuraList()
+	for _, a in pairs(C.AuraWatchList) do
+		for _, b in pairs(a) do
+			for _, c in pairs(b.List) do
+				if c.AuraID then
+					local exists = GetSpellInfo(c.AuraID)
+					if not exists then print("|cffFF0000Invalid spellID:|r "..c.AuraID) end
+				end
+			end
+		end
+	end
+end
+
 local function BuildAuraList()
 	AuraList = C.AuraWatchList["ALL"] and C.AuraWatchList["ALL"] or {}
 	for key, _ in pairs(C.AuraWatchList) do
@@ -149,8 +162,12 @@ local function BuildICON(iconSize)
 	Frame.Cooldown:SetAllPoints()
 	Frame.Cooldown:SetReverse(true)
 
-	Frame.Count = B.CreateFS(Frame, iconSize*.55, "", false, "BOTTOMRIGHT", 6, -3)
 	Frame.Spellname = B.CreateFS(Frame, 14, "", false, "BOTTOM", 0, -3)
+
+	local parentFrame = CreateFrame("Frame", nil, Frame)
+	parentFrame:SetAllPoints()
+	parentFrame:SetFrameLevel(Frame:GetFrameLevel() + 3)
+	Frame.Count = B.CreateFS(parentFrame, iconSize*.55, "", false, "BOTTOMRIGHT", 6, -3)
 
 	if NDuiDB["AuraWatch"]["Hint"] then
 		Frame:EnableMouse(true)
@@ -277,6 +294,7 @@ end
 
 local function Init()
 	ConvertTable()
+	CheckAuraList()
 	BuildAuraList()
 	BuildUnitIDTable()
 	BuildAura()

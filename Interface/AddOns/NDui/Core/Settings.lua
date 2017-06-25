@@ -18,7 +18,7 @@ end)
 
 -- Addon Info
 print("|cff0080ff< NDui >|cff70C0F5----------------")
-print("|cff00ff00  LEG|c00ffff00 "..DB.Version.." |c0000ff00"..L["Version Info1"])
+print("|cff00ff00  LEG|c00ffff00 "..DB.Version.." ("..DB.Support..") |c0000ff00"..L["Version Info1"])
 print("|c0000ff00  "..L["Version Info2"].."|c00ffff00 /ndui |c0000ff00"..L["Version Info3"])
 print("|cff70C0F5------------------------")
 
@@ -29,12 +29,11 @@ local function ForceDefaultSettings()
 	SetCVar("useCompactPartyFrames", 1)
 	SetCVar("lootUnderMouse", 1)
 	SetCVar("autoSelfCast", 1)
-	SetCVar("SpellTooltip_DisplayAvgValues", 1)
 	SetCVar("nameplateShowEnemies", 1)
 	SetCVar("nameplateShowSelf", 0)
 	SetCVar("nameplateShowAll", 1)
 	SetCVar("nameplateMotion", 1)
-	SetCVar("ShowClassColorInNameplate", 1)
+	--SetCVar("ShowClassColorInNameplate", 1)
 	SetCVar("nameplateShowFriendlyNPCs", 0)
 	SetCVar("screenshotQuality", 10)
 	SetCVar("showTutorials", 0)
@@ -82,14 +81,24 @@ local function ForceUIScale()
 		SetCVar("uiScale", scale)
 	end
 
-	-- Prevent Auto-scaling
+	-- Restore from Auto-scaling
+	local function RestoreUIScale(scale)
+		UIParent:SetScale(scale)
+		if NDuiDB["Chat"]["Lock"] then
+			ChatFrame1:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 28)
+		end
+	end
+
 	NDui:EventFrame("UI_SCALE_CHANGED"):SetScript("OnEvent", function()
 		if scale < .65 then
-			UIParent:SetScale(scale)
-			if NDuiDB["Chat"]["Lock"] then
-				ChatFrame1:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", 0, 28)
-			end
+			RestoreUIScale(scale)
 		end
+
+		C_Timer.After(1, function()
+			if scale < .65 and UIParent:GetScale() ~= scale then
+				RestoreUIScale(scale)
+			end
+		end)
 	end)
 end
 

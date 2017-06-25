@@ -16,6 +16,7 @@ local RaidDebuffsIgnore = {}
 
 local auraFilters = {
 	["HARMFUL"] = true,
+	["HELPFUL"] = true,
 }
 
 local DispellColor = {
@@ -220,7 +221,7 @@ local Update = function(self, event, unit)
 				end
 			end
 
-			if rd.ShowDispellableDebuff and debuffType then
+			if rd.ShowDispellableDebuff and debuffType and filter == "HARMFUL" then
 				local disPrio = rd.DispellPriority or DispellPriority
 				local disFilter = rd.DispellFilter or DispellFilter
 				local prio
