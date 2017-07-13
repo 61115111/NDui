@@ -1,4 +1,4 @@
-﻿local _, C, L, _ = unpack(select(2, ...))
+local _, C, L, _ = unpack(select(2, ...))
 --[[
 	>>>自定义添加时，要注意格式，注意逗号，注意字母大小写<<<
 	ALL下面是对全职业通用的设置，其他情况请在自己职业下添加。当你添加时，要注意是否重复。
@@ -89,6 +89,8 @@ C.AuraWatchList = {
 				--搏击伟哥
 				{AuraID = 230039, UnitID = "player"},
 		------>LEG饰品
+				--醒神宝典
+				{AuraID = 243942, UnitID = "player"},
 				--灭绝引擎
 				{AuraID = 242612, UnitID = "player"},
 				--节拍器
@@ -541,6 +543,8 @@ C.AuraWatchList = {
 				{AuraID = 218304, UnitID = "player"},
 				--黑夜的召唤
 				{AuraID = 218809, UnitID = "player"},
+				--离子爆炸
+				{AuraID = 218780, UnitID = "player"},
 			--占星师艾塔乌斯
 				--日冕喷射
 				{AuraID = 206464, UnitID = "player"},
@@ -619,7 +623,7 @@ C.AuraWatchList = {
 				{AuraID = 241600, UnitID = "player"},
 			--月之姐妹
 				--月蚀之拥
-				{AuraID = 233263, UnitID = "player", value = true},
+				{AuraID = 233263, UnitID = "player", Value = true},
 				--急速射击
 				{AuraID = 236596, UnitID = "player"},
 				--月光信标
@@ -668,11 +672,12 @@ C.AuraWatchList = {
 				{AuraID = 238018, UnitID = "player"},
 			--戒卫侍女
 				--光明灌注
-				{AuraID = 235213, UnitID = "player"},
+				{AuraID = 235213, UnitID = "player", Text = L["AW Light"]},
 				--邪能灌注
-				{AuraID = 235240, UnitID = "player"},
+				{AuraID = 235240, UnitID = "player", Text = L["AW Fel"]},
 				--动荡的灵魂
 				{AuraID = 243276, UnitID = "player"},
+				{AuraID = 235138, UnitID = "player"},
 				--恶魔活力
 				{AuraID = 235538, UnitID = "player"},
 				--造物者之赐
@@ -820,7 +825,7 @@ C.AuraWatchList = {
 				--愤怒
 				{AuraID = 241594, UnitID = "target"},
 				--月蚀之拥
-				{AuraID = 233264, UnitID = "target", value = true},
+				{AuraID = 233264, UnitID = "target", Value = true},
 				--致命尖叫
 				{AuraID = 236697, UnitID = "target"},
 				--骨牢护甲
@@ -828,9 +833,11 @@ C.AuraWatchList = {
 				--造物者之怒
 				{AuraID = 234891, UnitID = "target"},
 				--泰坦之壁
-				{AuraID = 235028, UnitID = "target", value = true},
+				{AuraID = 235028, UnitID = "target", Value = true},
+				--造物者之怒
+				{AuraID = 237339, UnitID = "target"},
 				--净化协议
-				{AuraID = 241008, UnitID = "target", value = true},
+				{AuraID = 241008, UnitID = "target", Value = true},
 				--故障
 				{AuraID = 233739, UnitID = "target"},
 				--矩阵强化
@@ -915,7 +922,7 @@ C.AuraWatchList = {
 				{AuraID = 188499, UnitID = "target"},
 				{AuraID = 210152, UnitID = "target"},
 				--混乱之刃
-				{AuraID = 211048, UnitID = "target"},
+				{AuraID = 247938, UnitID = "target"},
 				--疾影
 				{AuraID = 212800, UnitID = "target"},
 				--恶魔变形
@@ -1285,6 +1292,12 @@ C.AuraWatchList = {
 				{AuraID = 235712, UnitID = "player", Combat = true},
 				--哨兵视野，橙腰
 				{AuraID = 208913, UnitID = "player"},
+				--蛇语者之舌，橙胸
+				{AuraID = 248085, UnitID = "player"},
+				--致命瞄准，射击2T20
+				{AuraID = 242243, UnitID = "player"},
+				--精准，射击4T20
+				{AuraID = 246153, UnitID = "player"},
 			},
 		},
 		{	Name = "Focus Aura",
@@ -2054,8 +2067,6 @@ C.AuraWatchList = {
 				{AuraID = 197937, UnitID = "player"},
 				--虚空形态
 				{AuraID = 194249, UnitID = "player"},
-				--命运多舛
-				{AuraID = 194249, UnitID = "player"},
 				--虚空射线
 				{AuraID = 205372, UnitID = "player"},
 				--能量灌注
@@ -2552,6 +2563,8 @@ C.AuraWatchList = {
 				{AuraID = 152279, UnitID = "player"},
 				--冷酷之心
 				{AuraID = 235599, UnitID = "player"},
+				--食尸鬼主宰，2T20
+				{AuraID = 246995, UnitID = "player"},
 			},
 		},
 		{	Name = "Focus Aura",

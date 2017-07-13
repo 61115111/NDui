@@ -140,3 +140,38 @@ function module:BeamTool()
 	SlashCmdList["NDUI_BEAMTOOL"] = function() KrosusGo() end
 	SLASH_NDUI_BEAMTOOL1 = "/kro"
 end
+
+--[[
+	骂那些用反光棱镜的臭傻逼
+]]
+function module:ReflectingAlert()
+	if not NDuiDB["Misc"]["ReflectingAlert"] then return end
+
+	NDui:EventFrame("UNIT_SPELLCAST_SUCCEEDED"):SetScript("OnEvent", function(_, _, ...)
+		if not IsInGroup() then return end
+		local unit, spellName, _, _, spell = ...
+		if spell ~= 163219 then return end
+		if UnitInRaid(unit) or UnitInParty(unit) then
+			local unitName = GetUnitName(unit)
+			local name, itemLink = GetItemInfo(112384)
+			SendChatMessage(format(L["Reflecting Prism"], unitName, itemLink or name), IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY")
+		end
+	end)
+end
+
+--[[
+	工程移形换影装置使用通报
+]]
+function module:SwapingAlert()
+	if not NDuiDB["Misc"]["SwapingAlert"] then return end
+
+	NDui:EventFrame("COMBAT_LOG_EVENT_UNFILTERED"):SetScript("OnEvent", function(_, _, ...)
+		if not IsInGroup() then return end
+		local _, eventType, _, _, sourceName, _, _, _, destName, _, _, spellID, _, _, extraskillID = ...
+		if eventType ~= "SPELL_CAST_SUCCESS" or spellID ~= 161399 then return end
+		if UnitInRaid(sourceName) or UnitInParty(sourceName) then
+			local name, itemLink = GetItemInfo(111820)
+			SendChatMessage(format(L["Swapblaster"], sourceName, destName, itemLink or name), IsPartyLFG() and "INSTANCE_CHAT" or IsInRaid() and "RAID" or "PARTY")
+		end
+	end)
+end

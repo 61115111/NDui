@@ -3,6 +3,7 @@ local B, C, L, DB = unpack(select(2, ...))
 -- QuickQuest, by P3lim
 -- NDui MOD
 --------------------------
+local WorldMapTitleButton = _G.WorldMapTitleButton
 local mono = CreateFrame("CheckButton", nil, WorldMapTitleButton, "OptionsCheckButtonTemplate")
 mono:SetPoint("TOPRIGHT", WorldMapTitleButton, -100, -2)
 mono:SetSize(26, 26)
@@ -20,7 +21,7 @@ end)
 local QuickQuest = CreateFrame("Frame")
 QuickQuest:SetScript("OnEvent", function(self, event, ...) self[event](...) end)
 
-local atBank, atMail, atMerchant, choiceQueue, autoCompleteIndex, autoCompleteTicker
+local choiceQueue
 
 function QuickQuest:Register(event, func)
 	self:RegisterEvent(event)
@@ -58,6 +59,7 @@ local ignoreQuestNPC = {
 	[101462] = true,	-- Reaves
 	[43929] = true,		-- 4000
 	[106655] = true,	-- Legendary Item Upgrade
+	[14847] = true,		-- DarkMoon
 }
 
 local function GetQuestLogQuests(onlyComplete)

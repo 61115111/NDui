@@ -59,14 +59,27 @@ local function macroBody(class)
 	return body
 end
 
-local Enable = function(self)
-	local _, class = UnitClass("player")
-	if not class or not NDuiDB["UFs"]["AutoRes"] then return end
-
+local function setupAttribute(self, class)
 	if classList[class] and not IsAddOnLoaded("Clique") then
 		self:SetAttribute("*type3", "macro")
 		self:SetAttribute("macrotext3", macroBody(class))
 		return true
+	end
+end
+
+local delay = CreateFrame("Frame")
+local Enable = function(self)
+	local _, class = UnitClass("player")
+	if not class or not NDuiDB["UFs"]["AutoRes"] then return end
+
+	if not InCombatLockdown() then
+		setupAttribute(self, class)
+	else
+		delay:RegisterEvent("PLAYER_REGEN_ENABLED")
+		delay:SetScript("OnEvent", function()
+			setupAttribute(self, class)
+			delay:UnregisterAllEvents()
+		end)
 	end
 end
 

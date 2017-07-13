@@ -34,7 +34,7 @@ function module:OnLogin()
 			Bags = "bank",
 			Movable = true,
 		})
-		f.bank:SetFilter(onlyBank, true) 
+		f.bank:SetFilter(onlyBank, true)
 		f.bank:SetPoint("BOTTOMRIGHT", f.main, "BOTTOMLEFT", -20, 0)
 		f.bank:Hide()
 
@@ -44,7 +44,7 @@ function module:OnLogin()
 			Bags = "bankreagent",
 			Movable = true,
 		})
-		f.reagent:SetFilter(onlyReagent, true) 
+		f.reagent:SetFilter(onlyReagent, true)
 		f.reagent:SetPoint("BOTTOMLEFT", f.bank)
 		f.reagent:Hide()
 	end
@@ -75,7 +75,7 @@ function module:OnLogin()
 
 		self.Icon:SetAllPoints()
 		self.Icon:SetTexCoord(unpack(DB.TexCoord))
-		self.Count:SetPoint("BOTTOMRIGHT", 2, 0)
+		self.Count:SetPoint("BOTTOMRIGHT", 1, 1)
 		self.Count:SetFont(unpack(DB.Font))
 
 		self.Border = CreateFrame("Frame", nil, self)
@@ -111,7 +111,72 @@ function module:OnLogin()
 		end
 
 		if NDuiDB["Bags"]["BagsiLvl"] then
-			self.iLvl = B.CreateFS(self, 12, "", false, "BOTTOMLEFT", 2, 0)
+			self.iLvl = B.CreateFS(self, 12, "", false, "BOTTOMLEFT", 1, 1)
+		end
+
+		if NDuiDB["Bags"]["NewItemGlow"] then
+			local flash = self:CreateTexture(nil, "ARTWORK")
+			flash:SetTexture(DB.newItemFlash)
+			flash:SetPoint("TOPLEFT", -20, 20)
+			flash:SetPoint("BOTTOMRIGHT", 20, -20)
+			flash:SetBlendMode("ADD")
+			flash:SetAlpha(0)
+			local anim = flash:CreateAnimationGroup()
+			anim:SetLooping("REPEAT")
+			anim.rota = anim:CreateAnimation("Rotation")
+			anim.rota:SetDuration(1)
+			anim.rota:SetDegrees(-90)
+			anim.fader = anim:CreateAnimation("Alpha")
+			anim.fader:SetFromAlpha(0)
+			anim.fader:SetToAlpha(.5)
+			anim.fader:SetDuration(.5)
+			anim.fader:SetSmoothing("OUT")
+			anim.fader2 = anim:CreateAnimation("Alpha")
+			anim.fader2:SetStartDelay(.5)
+			anim.fader2:SetFromAlpha(.5)
+			anim.fader2:SetToAlpha(0)
+			anim.fader2:SetDuration(1.2)
+			anim.fader2:SetSmoothing("OUT")
+			self:HookScript("OnHide", function() if anim:IsPlaying() then anim:Stop() end end)
+
+			self.anim = anim
+		end
+
+		if NDuiDB["Bags"]["PreferPower"] > 1 then
+			local protect = self:CreateTexture(nil, "ARTWORK")
+			protect:SetTexture("Interface\\PETBATTLES\\DeadPetIcon")
+			protect:SetAllPoints()
+			protect:SetAlpha(0)
+			self.powerProtect = protect
+		end
+	end
+
+	local PowerDB = {}
+	local function isArtifactPower(link)
+		if PowerDB[link] then return true end
+
+		local tip = _G["NDuiPowerTip"] or CreateFrame("GameTooltip", "NDuiPowerTip", nil, "GameTooltipTemplate")
+		tip:SetOwner(UIParent, "ANCHOR_NONE")
+		tip:SetHyperlink(link)
+
+		for i = 2, 5 do
+			local textLine = _G["NDuiPowerTipTextLeft"..i]
+			if textLine and textLine:GetText() then
+				local isPower = strmatch(textLine:GetText(), _G.ARTIFACT_POWER)
+				if isPower then
+					PowerDB[link] = true
+					break
+				end
+			end
+		end
+		return PowerDB[link]
+	end
+
+	local function isPowerInWrongSpec()
+		if NDuiDB["Bags"]["PreferPower"] == 1 then return end
+		local spec = GetSpecialization()
+		if spec and spec + 1 ~= NDuiDB["Bags"]["PreferPower"] then
+			return true
 		end
 	end
 
@@ -149,11 +214,18 @@ function module:OnLogin()
 
 		if NDuiDB["Bags"]["BagsiLvl"] then
 			self.iLvl:SetText("")
-			local link = GetContainerItemLink(item.bagID, item.slotID)
-			if link and (rarity and rarity > 1) and (item.level and item.level > 0) and (item.subType == EJ_LOOT_SLOT_FILTER_ARTIFACT_RELIC or (item.equipLoc ~= "" and item.equipLoc ~= "INVTYPE_TABARD" and item.equipLoc ~= "INVTYPE_BODY")) then
-				local level = NDui:GetItemLevel(link, rarity)
+			if item.link and (rarity and rarity > 1) and (item.level and item.level > 0) and (item.subType == EJ_LOOT_SLOT_FILTER_ARTIFACT_RELIC or (item.equipLoc ~= "" and item.equipLoc ~= "INVTYPE_TABARD" and item.equipLoc ~= "INVTYPE_BODY")) then
+				local level = NDui:GetItemLevel(item.link, rarity)
 				self.iLvl:SetText(level)
 				self.iLvl:SetTextColor(color.r, color.g, color.b)
+			end
+		end
+
+		if self.powerProtect then
+			if isPowerInWrongSpec() and item.type == AUCTION_CATEGORY_CONSUMABLES and item.id ~= 147717 and item.link and isArtifactPower(item.link) then
+				self.powerProtect:SetAlpha(1)
+			else
+				self.powerProtect:SetAlpha(0)
 			end
 		end
 	end
@@ -176,7 +248,7 @@ function module:OnLogin()
 	local MyContainer = Bags:GetContainerClass()
 	function MyContainer:OnContentsChanged()
 		self:SortButtons("bagSlot")
-		local width, height = self:LayoutButtons("grid", self.Settings.Columns, 6, 10, -10)
+		local width, height = self:LayoutButtons("grid", self.Settings.Columns, 7, 10, -10)
 		self:SetSize(width + 20, height + 45)
 	end
 
@@ -211,7 +283,7 @@ function module:OnLogin()
 			self:SetMovable(true)
 			self:RegisterForClicks("LeftButton")
 			self:SetScript("OnMouseDown", function()
-				self:ClearAllPoints() 
+				self:ClearAllPoints()
 				self:StartMoving()
 			end)
 			self:SetScript("OnMouseUp", self.StopMovingOrSizing)
